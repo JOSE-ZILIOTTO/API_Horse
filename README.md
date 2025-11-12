@@ -25,9 +25,7 @@ Construída em **Delphi** com [Horse](https://github.com/HashLoad/horse) e **Fir
 - [Códigos de status](#códigos-de-status)
 - [Exemplos de uso](#exemplos-de-uso)
 - [Erros comuns & Troubleshooting](#erros-comuns--troubleshooting)
-- [Boas práticas](#boas-práticas)
 - [FAQ](#faq)
-- [Licença](#licença)
 
 ---
 
