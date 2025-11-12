@@ -63,9 +63,9 @@ Edite **`uDB.pas`**:
 ```pascal
 GConn := TFDConnection.Create(nil);
 GConn.Params.DriverID := 'FB';
-GConn.Params.Database := 'D:\...\SRP_ESTAVEL.FDB';
-GConn.Params.UserName := 'SYSDBA';
-GConn.Params.Password := 'masterkey';
+GConn.Params.Database := 'Diretório do Banco';
+GConn.Params.UserName := 'USERNAME';
+GConn.Params.Password := 'SENHA';
 GConn.Params.Add('CharacterSet=UTF8');
 GConn.LoginPrompt := False;
 GConn.Connected := True;
