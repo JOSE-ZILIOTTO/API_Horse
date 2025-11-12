@@ -229,15 +229,6 @@ Invoke-RestMethod "http://localhost:9000/api/v1/products/params?page=1&pageSize=
 
 ---
 
-## Boas práticas
-
-- **Validação de entrada:** `code` vazio ou `> 14` → 400.  
-- **Índices:** `TBL_PRODUTOS(UID)` e `TBL_PRODUTOS(COD_BARRA)`.  
-- **Precisão:** serialize `product_id` como string.  
-- **Observabilidade:** middleware de log de requests + tempo + status.
-
----
-
 ## FAQ
 
 **Posso usar `ROWS … OFFSET`?**  
