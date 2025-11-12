@@ -128,7 +128,6 @@ Lista parâmetros paginados.
 ### Produto (por id/code)
 ```json
 {
-  "product_id": "1234567890123",
   "params": {
     "uid": "1234567890123",
     "descricao": "Nome do produto",
@@ -147,7 +146,6 @@ Lista parâmetros paginados.
   "total": 287,
   "items": [
     {
-      "product_id": "1",
       "params": { "uid":"1", "descricao":"...", "valor_venda": 12.34 }
     }
   ]
@@ -242,9 +240,6 @@ Invoke-RestMethod "http://localhost:9000/api/v1/products/params?page=1&pageSize=
 
 ## FAQ
 
-**Por que `product_id`/`uid` são strings?**  
-Para não perder precisão em JS quando `BIGINT` > 53 bits.
-
 **Posso usar `ROWS … OFFSET`?**  
 Sim, se seu Firebird suportar; `FIRST/SKIP` é mais compatível.
 
@@ -252,7 +247,3 @@ Sim, se seu Firebird suportar; `FIRST/SKIP` é mais compatível.
 Implemente verificação de header `X-API-Key` em um middleware antes das rotas.
 
 ---
-
-## Licença
-
-Defina aqui (MIT/Apache-2.0/etc).
