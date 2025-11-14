@@ -17,15 +17,14 @@ Construída em **Delphi** com [Horse](https://github.com/HashLoad/horse) e **Fir
 - [Configuração](#configuração)
 - [Como rodar](#como-rodar)
 - [Endpoints](#endpoints)
-  - [GET `/api/v1/products/:id/params`](#get-apiv1productsidparams)
-  - [GET `/api/v1/products/code/:code/params`](#get-apiv1productscodecodeparams)
-  - [GET `/api/v1/products/params?page=&pageSize=`](#get-apiv1productsparamspagepagesize)
+  - [GET `/api/products/:id/params`](#get-apiproductsidparams)
+  - [GET `/api/products/code/:code/params`](#get-apiproductscodecodeparams)
+  -  [GET `/api/products/all/params`](#get-apiproductsallparams)
+  - [GET `/api/products/pages/params?page=&pageSize=`](#get-apiproductspagesparamspagepagesize)
 - [Esquemas de resposta](#esquemas-de-resposta)
 - [Paginação (Firebird)](#paginação-firebird)
 - [Códigos de status](#códigos-de-status)
 - [Exemplos de uso](#exemplos-de-uso)
-- [Erros comuns & Troubleshooting](#erros-comuns--troubleshooting)
-- [FAQ](#faq)
 
 ---
 
@@ -45,12 +44,7 @@ Fluxo: **Request → Controller → Repository → Firebird → JSON Response**.
 
 - Delphi (RAD Studio) com **FireDAC**  
 - Horse + units auxiliares (Horse.CORS, etc.)  
-- Firebird instalado e acessível (recomendado 2.5+; 3/4 funcionam)  
-- Banco com tabela `TBL_PRODUTOS` contendo ao menos:
-  - `UID` **BIGINT**
-  - `COD_BARRA` **VARCHAR(14)**
-  - `DESCRICAO` (texto)
-  - `VALOR_VENDA$` (numérico)
+- Firebird instalado e acessível (2.5+)  
 
 ---
 
@@ -69,19 +63,19 @@ GConn.LoginPrompt := False;
 GConn.Connected := True;
 ```
 
-> Dica: crie um alias no `databases.conf` (FB 3/4) e aponte `Database := 'alias:nome'`.
+> Dica: crie um alias no `databases.conf` (FB 2.5+) e aponte `Database := 'alias:nome'`.
 
 ---
 
 ## Como rodar
 
 1. **Clonar** o projeto e abrir no Delphi.  
-2. **Instalar dependências** (Horse).  
-3. **Executar** o servidor:
+2. **Instalar dependências**
+3. (Horse,Horse-CORS,dataset-serealize,horse/basic-auth).  
+4. **Executar** o servidor:
 
 ```pascal
 ConfigureFirebird;
-// Mock (opcional): RegisterProductsRoutes(TMemProductRepo.Create);
 RegisterProductsRoutes(TDBProductRepo.Create);
 THorse.Listen(9000);
 ```
@@ -92,7 +86,7 @@ A API ficará acessível em `http://localhost:9000/`.
 
 ## Endpoints
 
-### GET `/api/v1/products/:id/params`
+### GET `/api/products/:id/params`
 
 Busca parâmetros por **UID** (BIGINT).
 
@@ -102,15 +96,11 @@ Busca parâmetros por **UID** (BIGINT).
   - `400 Bad Request`: `id` inválido  
   - `404 Not Found`: produto não existe
 
-### GET `/api/v1/products/code/:code/params`
+### GET `/api/products/code/:code/params`
 
 Busca por **código de barras**.
 
-- **Path param:** `code` (`VARCHAR(14)`)  
-- **Regras:** `1..14` caracteres; zeros à esquerda preservados  
-- **Retornos:** `200 | 400 | 404`
-
-### GET `/api/v1/products/params?page=&pageSize=`
+### GET `/api/products/pages/params?page=&pageSize=`
 
 Lista parâmetros paginados.
 
@@ -126,10 +116,10 @@ Lista parâmetros paginados.
 ### Produto (por id/code)
 ```json
 {
-  "params": {
+  {
     "uid": "1234567890123",
     "descricao": "Nome do produto",
-    "valor_venda": 19.9
+    "valor_venda": 19.9...
   }
 }
 ```
@@ -144,7 +134,7 @@ Lista parâmetros paginados.
   "total": 287,
   "items": [
     {
-      "params": { "uid":"1", "descricao":"...", "valor_venda": 12.34 }
+        "uid":"1", "descricao":"...", "valor_venda": 12.34 ...
     }
   ]
 }
@@ -181,26 +171,13 @@ ORDER BY COD_PRODUTO;
 
 ```bash
 # Por UID
-curl -i http://localhost:9000/api/v1/products/123/params
+curl -i http://localhost:9000/api/products/123/params
 
 # Por código de barras
-curl -i http://localhost:9000/api/v1/products/code/7891234567890/params
+curl -i http://localhost:9000/api/products/code/7891234567890/params
 
 # Lista paginada
-curl -i "http://localhost:9000/api/v1/products/params?page=1&pageSize=50"
-```
-
-### PowerShell
-
-```powershell
-# Por UID
-Invoke-RestMethod "http://localhost:9000/api/v1/products/123/params"
-
-# Por código
-Invoke-RestMethod "http://localhost:9000/api/v1/products/code/7891234567890/params"
-
-# Lista
-Invoke-RestMethod "http://localhost:9000/api/v1/products/params?page=1&pageSize=50"
+curl -i "http://localhost:9000/api/products/pages/params?page=1&pageSize=50"
 ```
 
 ### Postman
@@ -210,27 +187,6 @@ Invoke-RestMethod "http://localhost:9000/api/v1/products/params?page=1&pageSize=
 - Params: `page`, `pageSize` quando aplicável  
 - Headers: `Accept: application/json`
 
----
-
-## Erros comuns & Troubleshooting
-
-### `SQL error code = -303 (arithmetic exception, numeric overflow, or string truncation)`
-- **Causa:** parâmetro string > tamanho da coluna (`COD_BARRA` > 14) ou número fora da faixa.
-- **Solução:** validar `code` (1..14) e usar `Param.DataType := ftString; Param.Size := 14`. Para `UID`, usar `ftLargeInt` + `AsLargeInt` (+ `Int64` no Delphi).
-
-### “offset desconhecido” na paginação
-- **Causa:** `ROWS … OFFSET` em versão antiga do Firebird.
-- **Solução:** use `FIRST :PageSize SKIP :Offset`.
-
-### Produto sempre 404
-- **Checklist:** repositório correto (memória vs banco), SQL direto no banco, nome/aspas do campo `VALOR_VENDA$`, log de SQL/params.
-
----
-
-## FAQ
-
-**Posso usar `ROWS … OFFSET`?**  
-Sim, se seu Firebird suportar; `FIRST/SKIP` é mais compatível.
 
 **Como proteger a API?**  
 Implemente verificação de header `X-API-Key` em um middleware antes das rotas.
