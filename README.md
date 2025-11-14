@@ -100,6 +100,8 @@ Busca parâmetros por **UID** (BIGINT).
 
 Busca por **código de barras**.
 
+### GET `/api/products/all/params
+
 ### GET `/api/products/pages/params?page=&pageSize=`
 
 Lista parâmetros paginados.
