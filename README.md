@@ -102,6 +102,8 @@ Busca por **código de barras**.
 
 ### GET `/api/products/all/params
 
+Lista todos os produtos.
+
 ### GET `/api/products/pages/params?page=&pageSize=`
 
 Lista parâmetros paginados.
