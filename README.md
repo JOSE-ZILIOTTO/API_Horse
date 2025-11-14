@@ -4,7 +4,7 @@ API **somente leitura** para consultar parâmetros de produtos a partir de um ba
 Construída em **Delphi** com [Horse](https://github.com/HashLoad/horse) e **FireDAC**.
 
 - **Status:** MVP – leitura apenas  
-- **Banco:** Firebird (UID = BIGINT, COD_BARRA = VARCHAR(14))  
+- **Banco:** Firebird   
 - **Formato:** JSON (UTF-8)  
 - **Porta padrão:** `9000`
 
