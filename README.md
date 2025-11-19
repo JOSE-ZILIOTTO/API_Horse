@@ -1,4 +1,4 @@
-# API de Parâmetros de Produtos (Horse + FireDAC + Firebird)
+# API de Consulta de Produtos (Horse + FireDAC + Firebird)
 
 API **somente leitura** para consultar parâmetros de produtos a partir de um banco **Firebird**.
 Construída em **Delphi** com [Horse](https://github.com/HashLoad/horse) e **FireDAC**.
